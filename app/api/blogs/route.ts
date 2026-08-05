@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllBlogs, createBlog } from "@/lib/blogs";
+import { revalidatePath } from "next/cache";
+
+export const revalidate = 300;
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,6 +31,14 @@ export async function POST(request: NextRequest) {
     }
 
     const newBlog = await createBlog(body);
+
+    try {
+      revalidatePath("/");
+      revalidatePath("/blog");
+    } catch (e) {
+      console.warn("Revalidate path warning:", e);
+    }
+
     return NextResponse.json(newBlog, { status: 201 });
   } catch (error: any) {
     console.error("POST /api/blogs error:", error);

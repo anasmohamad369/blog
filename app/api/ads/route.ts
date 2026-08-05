@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getHeroAd, updateHeroAd } from "@/lib/ads";
+import { revalidatePath } from "next/cache";
+
+// Revalidate cache every 5 minutes (300 seconds)
+export const revalidate = 300;
 
 export async function GET() {
   try {
@@ -22,6 +26,13 @@ export async function POST(request: NextRequest) {
       linkUrl: body.linkUrl || "#",
       title: body.title,
     });
+
+    // Instantly invalidate Home Page cache upon Admin Ad save
+    try {
+      revalidatePath("/");
+    } catch (e) {
+      console.warn("Revalidate path warning:", e);
+    }
 
     return NextResponse.json(updated, { status: 200 });
   } catch (error: any) {

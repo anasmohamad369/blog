@@ -5,6 +5,9 @@ import BlogCard from "@/components/BlogCard";
 import { getLatestBlogs } from "@/lib/blogs";
 import { getHeroAd } from "@/lib/ads";
 
+// Revalidate page data automatically every 5 minutes (300 seconds)
+export const revalidate = 300;
+
 export default async function HomePage() {
   const [latestBlogs, heroAd] = await Promise.all([
     getLatestBlogs(3),
@@ -70,7 +73,7 @@ export default async function HomePage() {
                     alt={heroAd.title || "Advertisement"}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent flex items-end p-5">
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent flex items-end p-5">
                     <div className="flex items-center justify-between w-full text-white">
                       <span className="text-xs sm:text-sm font-bold line-clamp-1">
                         {heroAd.title || "Featured Sponsor Announcement"}
