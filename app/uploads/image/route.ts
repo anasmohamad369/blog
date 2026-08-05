@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
-import fs from "fs";
-import path from "path";
+import { supabaseAdmin } from "@/lib/supabase";
+
+const BUCKET = "blog-images";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,45 +14,41 @@ export async function POST(request: NextRequest) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
 
-    // 1. Try uploading to Supabase Storage bucket 'blog-images'
-    try {
-      const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-      const { data, error } = await supabase.storage
-        .from("blog-images")
-        .upload(fileName, buffer, {
-          contentType: file.type || "image/png",
-          upsert: true,
-        });
+    // Auto-create bucket if it doesn't exist
+    const { data: buckets } = await supabaseAdmin.storage.listBuckets();
+    const bucketExists = buckets?.some((b) => b.name === BUCKET);
 
-      if (!error && data) {
-        const { data: publicUrlData } = supabase.storage
-          .from("blog-images")
-          .getPublicUrl(data.path);
-
-        if (publicUrlData?.publicUrl) {
-          return NextResponse.json({ url: publicUrlData.publicUrl }, { status: 200 });
-        }
-      }
-    } catch (supaErr) {
-      console.warn("Supabase upload attempted, falling back to local storage:", supaErr);
+    if (!bucketExists) {
+      await supabaseAdmin.storage.createBucket(BUCKET, {
+        public: true,
+        fileSizeLimit: 10 * 1024 * 1024,
+        allowedMimeTypes: ["image/png", "image/jpeg", "image/webp", "image/gif", "image/svg+xml"],
+      });
     }
 
-    // 2. Save file locally in public/uploads/ so EVERY uploaded image is saved and served 100% reliably
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
+    // Upload file to Supabase Storage
+    const { data, error } = await supabaseAdmin.storage
+      .from(BUCKET)
+      .upload(fileName, buffer, {
+        contentType: file.type || "image/png",
+        upsert: true,
+      });
+
+    if (error) {
+      console.error("Supabase Storage upload error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const safeFileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-    const filePath = path.join(uploadsDir, safeFileName);
+    // Get public URL
+    const { data: publicUrlData } = supabaseAdmin.storage
+      .from(BUCKET)
+      .getPublicUrl(data.path);
 
-    await fs.promises.writeFile(filePath, buffer);
-
-    const publicUrl = `/uploads/${safeFileName}`;
-    return NextResponse.json({ url: publicUrl }, { status: 200 });
-  } catch (error) {
+    return NextResponse.json({ url: publicUrlData.publicUrl }, { status: 200 });
+  } catch (error: any) {
     console.error("Image upload error:", error);
-    return NextResponse.json({ error: "Image upload failed" }, { status: 500 });
+    return NextResponse.json({ error: error?.message || "Image upload failed" }, { status: 500 });
   }
 }

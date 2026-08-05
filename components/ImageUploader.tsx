@@ -35,38 +35,21 @@ export default function ImageUploader({
       const formData = new FormData();
       formData.append("file", file);
 
-      let returnedUrl = "";
+      const res = await fetch("/uploads/image", {
+        method: "POST",
+        body: formData,
+      });
 
-      // 1. Try uploading to relative /uploads/image API endpoint
-      try {
-        const res = await fetch("/uploads/image", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          returnedUrl = data.url;
-        }
-      } catch (err) {
-        console.warn("Relative /uploads/image upload failed, trying localhost fallback:", err);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Upload failed");
       }
 
-      // 2. Try direct localhost:3000 endpoint if relative fetch failed
-      if (!returnedUrl) {
-        const res = await fetch("http://localhost:3000/uploads/image", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          returnedUrl = data.url;
-        }
-      }
+      const data = await res.json();
+      const returnedUrl = data.url;
 
       if (!returnedUrl) {
-        throw new Error("Could not retrieve uploaded image URL");
+        throw new Error("No image URL returned from server");
       }
 
       onChange(returnedUrl);
