@@ -1,12 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import BlogHero from "@/components/BlogHero";
-import BlogCard from "@/components/BlogCard";
-import SearchBar from "@/components/SearchBar";
-import CategoryFilter from "@/components/CategoryFilter";
+import Link from "next/link";
 import { Blog } from "@/lib/types";
-import { SearchX, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ArrowUpRight, SearchX, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 
 interface BlogListClientProps {
   initialBlogs: Blog[];
@@ -38,7 +35,7 @@ export default function BlogListClient({ initialBlogs, categories }: BlogListCli
       );
     }
 
-    // Latest first
+    // Sort latest first
     result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     return result;
   }, [initialBlogs, search, selectedCategory]);
@@ -51,116 +48,167 @@ export default function BlogListClient({ initialBlogs, categories }: BlogListCli
   }, [filteredBlogs, currentPage, itemsPerPage]);
 
   const handleCategoryChange = (cat: string) => {
-    setSelectedCategory(cat);
-    setCurrentPage(1);
-  };
-
-  const handleSearchChange = (val: string) => {
-    setSearch(val);
+    setSelectedCategory(cat === selectedCategory ? "" : cat);
     setCurrentPage(1);
   };
 
   return (
-    <div className="space-y-12 pb-24">
-      {/* Blog Page Hero */}
-      <BlogHero
-        title="Insights, Guides & Industry Knowledge"
-        subtitle="Explore expert articles, practical tips, installation guides, and the latest innovations in earthing and electrical safety to help you make informed decisions."
-      />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Search & Category Filter Controls */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 shadow-md space-y-6">
-          <div className="max-w-xl">
-            <SearchBar value={search} onChange={handleSearchChange} />
-          </div>
-
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/60">
-            <CategoryFilter
-              categories={categories}
-              selectedCategory={selectedCategory || "All"}
-              onSelectCategory={handleCategoryChange}
-            />
-          </div>
-        </div>
-
-        {/* Results Stats */}
-        <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 px-1">
-          <span>
-            Showing {filteredBlogs.length} {filteredBlogs.length === 1 ? "article" : "articles"}
-            {selectedCategory ? ` in "${selectedCategory}"` : ""}
-            {search ? ` matching "${search}"` : ""}
-          </span>
-          <span>Page {currentPage} of {totalPages}</span>
-        </div>
-
-        {/* Blog Grid or Empty State */}
-        {paginatedBlogs.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {paginatedBlogs.map((blog) => (
-              <BlogCard key={blog.id} blog={blog} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 space-y-4 max-w-lg mx-auto">
-            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
-              <SearchX className="w-8 h-8" />
+    <div className="bg-white dark:bg-slate-950 min-h-screen py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          
+          {/* Left Column: Title, Description & Category Navigation */}
+          <div className="lg:col-span-4 lg:sticky lg:top-28 space-y-8">
+            <div className="space-y-3">
+              <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
+                Latest Blogs
+              </h1>
+              <p className="text-base text-slate-500 dark:text-slate-400 font-normal leading-relaxed">
+                Explore technical guides, electrical grounding best practices, lightning protection standards, and safety insights compiled by experts.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white">No Articles Found</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 px-6">
-              We couldn't find any articles matching your search query or selected category.
-            </p>
-            <button
-              onClick={() => {
-                setSearch("");
-                setSelectedCategory("");
-                setCurrentPage(1);
-              }}
-              className="px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow transition-colors"
-            >
-              Reset Filters
-            </button>
+
+            {/* Category Filter Pills */}
+            <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                Filter by Topic
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((cat) => {
+                  const isActive = (selectedCategory || "All") === cat;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => handleCategoryChange(cat === "All" ? "" : cat)}
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+                        isActive
+                          ? "bg-slate-900 text-white dark:bg-emerald-500 dark:text-slate-950 border-slate-900 dark:border-emerald-500 shadow-sm"
+                          : "bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-        )}
 
-        {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center space-x-3 pt-8">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className="p-3 rounded-full border border-slate-200 dark:border-slate-800 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
-              title="Previous page"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
+          {/* Right Column: Search Bar & Stacked List Cards */}
+          <div className="lg:col-span-8 space-y-6">
+            
+            {/* Top Search Input */}
+            <div className="relative">
+              <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setCurrentPage(1);
+                }}
+                placeholder="Search articles, categories, or keywords..."
+                className="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900 dark:text-white"
+              />
+            </div>
 
-            <div className="flex items-center space-x-1.5">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+            {/* Stacked Article List */}
+            {paginatedBlogs.length > 0 ? (
+              <div className="space-y-4">
+                {paginatedBlogs.map((blog) => (
+                  <Link
+                    key={blog.id}
+                    href={`/blog/${blog.slug}`}
+                    className="group block bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="space-y-3">
+                      {/* Meta header: Category Badge & Date */}
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-bold uppercase tracking-wider text-amber-600 dark:text-emerald-400">
+                            {blog.category}
+                          </span>
+                          <span className="text-slate-300 dark:text-slate-700">•</span>
+                          <span className="text-slate-400 dark:text-slate-500 font-medium">
+                            {new Date(blog.createdAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "2-digit",
+                              year: "numeric",
+                            })}
+                          </span>
+                        </div>
+
+                        {/* Top-right arrow icon */}
+                        <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white group-hover:bg-slate-100 dark:group-hover:bg-slate-700 transition-all">
+                          <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </div>
+                      </div>
+
+                      {/* Title */}
+                      <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-snug">
+                        {blog.title}
+                      </h2>
+
+                      {/* Excerpt */}
+                      <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-normal">
+                        {blog.excerpt}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 bg-slate-50/50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-4">
+                <SearchX className="w-10 h-10 text-slate-400 mx-auto" />
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">No Articles Found</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  No blog articles match your current search query or selected category.
+                </p>
                 <button
-                  key={pageNum}
-                  onClick={() => setCurrentPage(pageNum)}
-                  className={`w-10 h-10 rounded-full font-bold text-xs transition-all ${
-                    currentPage === pageNum
-                      ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30"
-                      : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800"
-                  }`}
+                  onClick={() => {
+                    setSearch("");
+                    setSelectedCategory("");
+                    setCurrentPage(1);
+                  }}
+                  className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-semibold"
                 >
-                  {pageNum}
+                  Clear Filters
                 </button>
-              ))}
-            </div>
+              </div>
+            )}
 
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-              className="p-3 rounded-full border border-slate-200 dark:border-slate-800 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
-              title="Next page"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="flex items-center space-x-1 text-xs font-semibold text-slate-600 dark:text-slate-400 disabled:opacity-40"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  <span>Previous</span>
+                </button>
+
+                <span className="text-xs text-slate-400 font-medium">
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="flex items-center space-x-1 text-xs font-semibold text-slate-600 dark:text-slate-400 disabled:opacity-40"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
           </div>
-        )}
+
+        </div>
+
       </div>
     </div>
   );

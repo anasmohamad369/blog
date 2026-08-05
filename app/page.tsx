@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ShieldCheck, Zap, Layers, ExternalLink } from "lucide-react";
 import BlogCard from "@/components/BlogCard";
+import ConsultancyForm from "@/components/ConsultancyForm";
 import { getLatestBlogs } from "@/lib/blogs";
 import { getHeroAd } from "@/lib/ads";
 
@@ -161,9 +162,7 @@ export default async function HomePage() {
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               Latest Articles
             </h2>
-            <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
-              Stay updated with practical knowledge, expert advice, and the latest trends in electrical grounding and safety.
-            </p>
+          
           </div>
 
           <Link
@@ -181,6 +180,11 @@ export default async function HomePage() {
             <BlogCard key={blog.id} blog={blog} />
           ))}
         </div>
+      </section>
+
+      {/* 4. Talk to an Expert / Consultancy Form Section */}
+      <section id="consultancy" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in-up">
+        <ConsultancyForm />
       </section>
     </div>
   );

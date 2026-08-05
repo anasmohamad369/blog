@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Blog } from "@/lib/types";
 import AdManager from "@/components/AdManager";
+import ConsultancyAdminViewer from "@/components/ConsultancyAdminViewer";
 import { Plus, Edit3, Trash2, Eye, Search, FileText, CheckCircle, Clock, AlertCircle } from "lucide-react";
 
 export default function AdminBlogDashboard() {
@@ -65,7 +66,7 @@ export default function AdminBlogDashboard() {
             Blog Admin Dashboard
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Manage, publish, edit, or remove blog articles and configure Hero advertisement banners.
+            Manage, publish, edit, or remove blog articles, view consultancy requests, and configure Hero advertisement banners.
           </p>
         </div>
 
@@ -201,6 +202,9 @@ export default function AdminBlogDashboard() {
           </div>
         )}
       </div>
+
+      {/* Consultancy Requests Admin Viewer */}
+      <ConsultancyAdminViewer />
 
       {/* Hero Advertisement Configurator */}
       <AdManager />
