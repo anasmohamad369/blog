@@ -1,49 +1,87 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, ShieldCheck, Zap, Layers, CheckCircle } from "lucide-react";
+import { ArrowRight, ShieldCheck, Zap, Layers, ExternalLink } from "lucide-react";
 import BlogCard from "@/components/BlogCard";
 import { getLatestBlogs } from "@/lib/blogs";
+import { getHeroAd } from "@/lib/ads";
 
 export default async function HomePage() {
-  const latestBlogs = await getLatestBlogs(3);
+  const [latestBlogs, heroAd] = await Promise.all([
+    getLatestBlogs(3),
+    getHeroAd(),
+  ]);
+
+  const adImage = heroAd.imageUrl || "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200&auto=format&fit=crop";
 
   return (
     <div className="space-y-16 md:space-y-24 pb-20">
-      {/* 1. Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white pt-20 pb-24 md:pt-28 md:pb-32 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-          <div className="absolute top-10 left-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl" />
-        </div>
+      {/* 1. Hero Section - Simple UI with Text on Left & Advertisement Placement on Right */}
+      <section className="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 py-12 md:py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+            
+            {/* Left Side: Clean Text & Actions */}
+            <div className="lg:col-span-7 space-y-6 text-left">
+              <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Industrial Grounding & Safety Experts</span>
+              </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto text-center space-y-8">
-          <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-800 text-emerald-400 text-xs font-bold uppercase tracking-wider shadow-lg">
-            <Zap className="w-4 h-4 text-emerald-400" />
-            <span>Industrial Grounding & Safety Experts</span>
-          </div>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+                Build Safer Electrical Systems With <span className="text-emerald-600 dark:text-emerald-400">Certified Earthing</span>
+              </h1>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight">
-            Build Safer Electrical Systems With <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">Certified Earthing</span>
-          </h1>
+              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl font-normal leading-relaxed">
+                Discover comprehensive technical guides, industry standards, installation best practices, and expert advice on electrical grounding and lightning protection.
+              </p>
 
-          <p className="text-base sm:text-xl text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
-            Discover comprehensive technical guides, industry standards, installation best practices, and expert advice on electrical grounding and lightning protection.
-          </p>
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <Link
+                  href="/blog"
+                  className="px-7 py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow-md transition-all flex items-center space-x-2"
+                >
+                  <span>Explore Latest Articles</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  href="#about"
+                  className="px-7 py-3.5 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-sm transition-all"
+                >
+                  <span>Learn About Earthing</span>
+                </Link>
+              </div>
+            </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Link
-              href="/blog"
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-base shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2"
-            >
-              <span>Explore Latest Articles</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="#about"
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-semibold text-base transition-all flex items-center justify-center space-x-2"
-            >
-              <span>Learn About Earthing</span>
-            </Link>
+            {/* Right Side: Advertisement Placement */}
+            <div className="lg:col-span-5 w-full">
+              <div className="relative group rounded-3xl overflow-hidden bg-white dark:bg-slate-800 border-2 border-dashed border-emerald-500/40 p-2 shadow-xl">
+                <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-black/70 backdrop-blur-md rounded-full text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 border border-emerald-500/30 flex items-center space-x-1">
+                  <span>Sponsored Ad</span>
+                </div>
+
+                <a
+                  href={heroAd.linkUrl || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block relative h-64 sm:h-80 w-full rounded-2xl overflow-hidden group-hover:opacity-95 transition-opacity"
+                >
+                  <img
+                    src={adImage}
+                    alt={heroAd.title || "Advertisement"}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent flex items-end p-5">
+                    <div className="flex items-center justify-between w-full text-white">
+                      <span className="text-xs sm:text-sm font-bold line-clamp-1">
+                        {heroAd.title || "Featured Sponsor Announcement"}
+                      </span>
+                      <ExternalLink className="w-4 h-4 text-emerald-400 ml-2 flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Blog } from "@/lib/types";
+import AdManager from "@/components/AdManager";
 import { Plus, Edit3, Trash2, Eye, Search, FileText, CheckCircle, Clock, AlertCircle } from "lucide-react";
 
 export default function AdminBlogDashboard() {
@@ -56,7 +57,7 @@ export default function AdminBlogDashboard() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-md">
         <div>
@@ -64,7 +65,7 @@ export default function AdminBlogDashboard() {
             Blog Admin Dashboard
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Manage, publish, edit, or remove blog articles and image assets.
+            Manage, publish, edit, or remove blog articles and configure Hero advertisement banners.
           </p>
         </div>
 
@@ -200,6 +201,9 @@ export default function AdminBlogDashboard() {
           </div>
         )}
       </div>
+
+      {/* Hero Advertisement Configurator */}
+      <AdManager />
 
       {/* Delete Confirmation Modal */}
       {deleteId && (
