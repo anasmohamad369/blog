@@ -1,5 +1,7 @@
 import { supabase } from "./supabase";
 
+export type EnquiryStatus = "new" | "contacted" | "resolved";
+
 export interface ConsultancyRequest {
   id: string;
   name: string;
@@ -7,6 +9,7 @@ export interface ConsultancyRequest {
   phone?: string;
   category?: string;
   message: string;
+  status: EnquiryStatus;
   createdAt: string;
 }
 
@@ -19,6 +22,7 @@ export async function createConsultancyRequest(input: {
 }): Promise<ConsultancyRequest> {
   const now = new Date().toISOString();
   const id = "consultancy-" + Date.now();
+  const status: EnquiryStatus = "new";
 
   const reqItem: ConsultancyRequest = {
     id,
@@ -27,6 +31,7 @@ export async function createConsultancyRequest(input: {
     phone: input.phone?.trim() || "",
     category: input.category || "General Inquiry",
     message: input.message.trim(),
+    status,
     createdAt: now,
   };
 
@@ -34,12 +39,13 @@ export async function createConsultancyRequest(input: {
     id: reqItem.id,
     title: reqItem.name,
     slug: reqItem.id,
-    excerpt: `${reqItem.email}${reqItem.phone ? " • " + reqItem.phone : ""}`,
+    excerpt: `${reqItem.email} • ${reqItem.phone || ""}`,
     content: reqItem.message,
     coverImage: "",
     bannerImage: "",
     category: "ConsultancyRequest",
     tags: reqItem.category || "General Inquiry",
+    seoTitle: status,
     published: false,
     createdAt: now,
     updatedAt: now,
@@ -75,6 +81,7 @@ export async function getConsultancyRequests(): Promise<ConsultancyRequest[]> {
           phone: parts[1] || "",
           category: d.tags || "General Inquiry",
           message: d.content,
+          status: (d.seoTitle as EnquiryStatus) || "new",
           createdAt: d.createdAt || new Date().toISOString(),
         };
       });
@@ -84,4 +91,40 @@ export async function getConsultancyRequests(): Promise<ConsultancyRequest[]> {
   }
 
   return [];
+}
+
+export async function updateConsultancyStatus(id: string, status: EnquiryStatus): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("Blog")
+      .update({ seoTitle: status, updatedAt: new Date().toISOString() })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Failed to update status:", error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("updateConsultancyStatus error:", err);
+    return false;
+  }
+}
+
+export async function deleteConsultancyRequest(id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("Blog")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Failed to delete request:", error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("deleteConsultancyRequest error:", err);
+    return false;
+  }
 }

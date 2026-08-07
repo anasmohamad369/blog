@@ -32,6 +32,8 @@ export async function getAllBlogs(options: BlogFilterOptions = {}): Promise<Pagi
 
   try {
     let query = supabase.from(TABLE).select("*", { count: "exact" });
+    query = query.neq("id", "hero-ad");
+    query = query.neq("id", "admin-config");
     query = query.eq("published", true);
 
     if (category && category !== "All") {
@@ -74,6 +76,7 @@ export async function getLatestBlogs(limit = 3): Promise<Blog[]> {
   const { data, error } = await supabase
     .from(TABLE)
     .select("*")
+    .neq("id", "hero-ad")
     .eq("published", true)
     .order("createdAt", { ascending: false })
     .limit(limit);
@@ -108,6 +111,7 @@ export async function getRelatedBlogs(category: string, currentSlug: string, lim
   const { data, error } = await supabase
     .from(TABLE)
     .select("*")
+    .neq("id", "hero-ad")
     .eq("category", category)
     .neq("slug", currentSlug)
     .eq("published", true)

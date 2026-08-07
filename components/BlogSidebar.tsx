@@ -1,13 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
-import { User, Tag, Mail, ShieldAlert, ArrowRight } from "lucide-react";
+import { User, Tag, ShieldAlert, ArrowRight, ExternalLink, Megaphone } from "lucide-react";
 import { Blog } from "@/lib/types";
+import { AdConfig } from "@/lib/ads";
 
 interface BlogSidebarProps {
   blog: Blog;
+  heroAd?: AdConfig;
 }
 
-export default function BlogSidebar({ blog }: BlogSidebarProps) {
+export default function BlogSidebar({ blog, heroAd }: BlogSidebarProps) {
   return (
     <aside className="space-y-8 lg:sticky lg:top-24">
       {/* Author Card */}
@@ -25,6 +27,39 @@ export default function BlogSidebar({ blog }: BlogSidebarProps) {
           Providing industry-certified guidance, grounding products, and technical testing for electrical safety compliance.
         </p>
       </div>
+
+      {/* Featured Sponsored Advertisement Box */}
+      {heroAd && (
+        <div className="p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-md space-y-4 group">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+              <Megaphone className="w-3.5 h-3.5" />
+              <span>Sponsored Ad</span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-semibold uppercase">Featured</span>
+          </div>
+
+          <a
+            href={heroAd.linkUrl || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block space-y-3"
+          >
+            <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+              <Image
+                src={heroAd.imageUrl || "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200&auto=format&fit=crop"}
+                alt={heroAd.title || "Featured Sponsor"}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <div className="flex items-center justify-between text-slate-900 dark:text-white font-bold text-xs">
+              <span className="line-clamp-2">{heroAd.title || "Featured Product Announcement"}</span>
+              <ExternalLink className="w-4 h-4 text-emerald-500 ml-2 flex-shrink-0" />
+            </div>
+          </a>
+        </div>
+      )}
 
       {/* Article Tags */}
       {blog.tags && blog.tags.length > 0 && (
@@ -56,7 +91,7 @@ export default function BlogSidebar({ blog }: BlogSidebarProps) {
           Get expert recommendations on earth electrode sizing, soil resistivity calculations, and lightning protection.
         </p>
         <Link
-          href="/#contact"
+          href="/#consultancy"
           className="inline-flex items-center justify-center w-full py-3 px-4 bg-white text-emerald-950 font-bold text-xs rounded-xl shadow hover:bg-emerald-50 transition-colors space-x-2"
         >
           <span>Request Consultation</span>

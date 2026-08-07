@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
-import { Calendar, Clock, ArrowLeft, User, ShieldCheck } from "lucide-react";
+import { Calendar, Clock, ArrowLeft, User } from "lucide-react";
 import { getBlogBySlug, getRelatedBlogs } from "@/lib/blogs";
+import { getHeroAd } from "@/lib/ads";
 import { calculateReadingTime } from "@/lib/utils";
 import BlogContent from "@/components/BlogContent";
 import BlogBanner from "@/components/BlogBanner";
@@ -45,7 +46,11 @@ export default async function SingleBlogPage({ params }: BlogSlugPageProps) {
     notFound();
   }
 
-  const relatedBlogs = await getRelatedBlogs(blog.category, blog.slug, 3);
+  const [relatedBlogs, heroAd] = await Promise.all([
+    getRelatedBlogs(blog.category, blog.slug, 3),
+    getHeroAd(),
+  ]);
+
   const readingTime = calculateReadingTime(blog.content);
   const formattedDate = new Date(blog.createdAt).toLocaleDateString("en-US", {
     month: "long",
@@ -132,15 +137,16 @@ export default async function SingleBlogPage({ params }: BlogSlugPageProps) {
 
             {/* Full-width Advertisement Banner Image/Text overlay below article */}
             <BlogBanner
-              bannerImage={blog.bannerImage || "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200&auto=format&fit=crop"}
-              heading="Need Professional Earthing Installation?"
-              ctaText="Contact Our Experts"
+              bannerImage={blog.bannerImage || heroAd.imageUrl}
+              heading={heroAd.title || "Need Professional Earthing Installation?"}
+              ctaText="Visit Sponsor / Learn More"
+              ctaUrl={heroAd.linkUrl || "/#consultancy"}
             />
           </div>
 
           {/* Sticky Sidebar */}
           <div className="lg:col-span-4">
-            <BlogSidebar blog={blog} />
+            <BlogSidebar blog={blog} heroAd={heroAd} />
           </div>
         </div>
 
