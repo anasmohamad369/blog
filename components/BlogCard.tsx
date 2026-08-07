@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Clock, Calendar, ArrowRight } from "lucide-react";
+import { Clock, Calendar, ArrowRight, Tag } from "lucide-react";
 import { Blog } from "@/lib/types";
 import { calculateReadingTime } from "@/lib/utils";
 
@@ -62,13 +62,28 @@ export default function BlogCard({ blog, featured = false }: BlogCardProps) {
           {blog.excerpt}
         </p>
 
+        {/* SEO Tags Badges */}
+        {blog.tags && blog.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {blog.tags.slice(0, 3).map((tag, idx) => (
+              <span
+                key={idx}
+                className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/90 rounded-md"
+              >
+                <Tag className="w-2.5 h-2.5 mr-1 text-emerald-500" />
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* Read More Link */}
         <div className="pt-2 border-t border-slate-100 dark:border-slate-800/60">
           <Link
             href={`/blog/${blog.slug}`}
             className="inline-flex items-center space-x-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors"
           >
-            <span>Read More</span>
+            <span>Read Article & Technical Specs</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>

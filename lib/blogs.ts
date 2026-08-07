@@ -40,7 +40,7 @@ export async function getAllBlogs(options: BlogFilterOptions = {}): Promise<Pagi
       query = query.eq("category", category);
     }
     if (search) {
-      query = query.or(`title.ilike.%${search}%,excerpt.ilike.%${search}%,content.ilike.%${search}%`);
+      query = query.or(`title.ilike.%${search}%,excerpt.ilike.%${search}%,content.ilike.%${search}%,category.ilike.%${search}%,tags.ilike.%${search}%`);
     }
 
     query = query.order("createdAt", { ascending: false });
