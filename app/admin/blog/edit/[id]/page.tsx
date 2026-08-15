@@ -1,18 +1,17 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save, Sparkles, AlertCircle, Loader2 } from "lucide-react";
 import ImageUploader from "@/components/ImageUploader";
+import { generateSlug } from "@/lib/utils";
+import { parseBannerData, stringifyBannerData } from "@/lib/blogs";
 
-interface EditBlogPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default function EditBlogPage({ params }: EditBlogPageProps) {
-  const { id } = use(params);
+export default function EditBlogPage() {
   const router = useRouter();
+  const rawParams = useParams();
+  const id = (rawParams?.id as string) || "";
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -26,6 +25,8 @@ export default function EditBlogPage({ params }: EditBlogPageProps) {
     tags: "",
     coverImage: "",
     bannerImage: "",
+    bannerLink: "",
+    bannerTitle: "",
     seoTitle: "",
     seoDescription: "",
     published: true,
@@ -33,11 +34,13 @@ export default function EditBlogPage({ params }: EditBlogPageProps) {
 
   useEffect(() => {
     async function fetchBlog() {
+      if (!id) return;
       try {
         setLoading(true);
         const res = await fetch(`/api/blogs/${id}`);
         if (!res.ok) throw new Error("Blog not found");
         const data = await res.json();
+        const bannerInfo = parseBannerData(data.bannerImage);
         setFormData({
           title: data.title || "",
           slug: data.slug || "",
@@ -46,7 +49,9 @@ export default function EditBlogPage({ params }: EditBlogPageProps) {
           category: data.category || "Installation & Safety",
           tags: Array.isArray(data.tags) ? data.tags.join(", ") : data.tags || "",
           coverImage: data.coverImage || "",
-          bannerImage: data.bannerImage || "",
+          bannerImage: bannerInfo.imageUrl,
+          bannerLink: bannerInfo.linkUrl,
+          bannerTitle: bannerInfo.title,
           seoTitle: data.seoTitle || "",
           seoDescription: data.seoDescription || "",
           published: data.published ?? true,
@@ -71,11 +76,18 @@ export default function EditBlogPage({ params }: EditBlogPageProps) {
     setErrorMsg(null);
 
     try {
+      const fullBannerImage = stringifyBannerData({
+        imageUrl: formData.bannerImage,
+        linkUrl: formData.bannerLink,
+        title: formData.bannerTitle,
+      });
+
       const res = await fetch(`/api/blogs/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          bannerImage: fullBannerImage,
           tags: formData.tags.split(",").map((t) => t.trim()).filter(Boolean),
         }),
       });
@@ -220,12 +232,46 @@ export default function EditBlogPage({ params }: EditBlogPageProps) {
               onChange={(url) => setFormData((prev) => ({ ...prev, coverImage: url }))}
             />
 
-            <ImageUploader
-              label="Advertisement Banner Image"
-              value={formData.bannerImage}
-              aspectRatio="banner"
-              onChange={(url) => setFormData((prev) => ({ ...prev, bannerImage: url }))}
-            />
+            <div className="space-y-4">
+              <ImageUploader
+                label="Advertisement Banner Image (Optional)"
+                value={formData.bannerImage}
+                aspectRatio="banner"
+                description="Recommended resolution: 1200 x 630 px (16:9 ratio)"
+                onChange={(url) => setFormData((prev) => ({ ...prev, bannerImage: url }))}
+              />
+
+              <div className="space-y-3 pt-1">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Ad Target Link URL (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.bannerLink}
+                    onChange={(e) => setFormData({ ...formData, bannerLink: e.target.value })}
+                    placeholder="https://example.com/product-landing-page"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    URL opened when visitors click this ad on the blog page.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Ad Title / Caption (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.bannerTitle}
+                    onChange={(e) => setFormData({ ...formData, bannerTitle: e.target.value })}
+                    placeholder="e.g. Special Offer on Chemical Earthing Rods"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4">

@@ -1,4 +1,5 @@
 import { getAllBlogs } from "@/lib/blogs";
+import { getHeroAd } from "@/lib/ads";
 import BlogListClient from "./BlogListClient";
 import { Metadata } from "next";
 
@@ -11,7 +12,11 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogListPage() {
-  const data = await getAllBlogs({ limit: 100 });
+  const [data, heroAd] = await Promise.all([
+    getAllBlogs({ limit: 100 }),
+    getHeroAd(),
+  ]);
 
-  return <BlogListClient initialBlogs={data.blogs} categories={data.categories} />;
+  return <BlogListClient initialBlogs={data.blogs} categories={data.categories} heroAd={heroAd} />;
 }
+

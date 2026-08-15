@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Save, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
 import ImageUploader from "@/components/ImageUploader";
 import { generateSlug } from "@/lib/utils";
+import { stringifyBannerData } from "@/lib/blogs";
 
 export default function CreateBlogPage() {
   const router = useRouter();
@@ -21,6 +22,8 @@ export default function CreateBlogPage() {
     tags: "",
     coverImage: "",
     bannerImage: "",
+    bannerLink: "",
+    bannerTitle: "",
     seoTitle: "",
     seoDescription: "",
     published: true,
@@ -45,11 +48,18 @@ export default function CreateBlogPage() {
     setErrorMsg(null);
 
     try {
+      const fullBannerImage = stringifyBannerData({
+        imageUrl: formData.bannerImage,
+        linkUrl: formData.bannerLink,
+        title: formData.bannerTitle,
+      });
+
       const res = await fetch("/api/blogs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          bannerImage: fullBannerImage,
           tags: formData.tags.split(",").map((t) => t.trim()).filter(Boolean),
         }),
       });
@@ -196,12 +206,46 @@ export default function CreateBlogPage() {
               onChange={(url) => setFormData((prev) => ({ ...prev, coverImage: url }))}
             />
 
-            <ImageUploader
-              label="Advertisement Banner Image (Optional)"
-              value={formData.bannerImage}
-              aspectRatio="banner"
-              onChange={(url) => setFormData((prev) => ({ ...prev, bannerImage: url }))}
-            />
+            <div className="space-y-4">
+              <ImageUploader
+                label="Advertisement Banner Image (Optional)"
+                value={formData.bannerImage}
+                aspectRatio="banner"
+                description="Recommended resolution: 1200 x 630 px (16:9 ratio)"
+                onChange={(url) => setFormData((prev) => ({ ...prev, bannerImage: url }))}
+              />
+
+              <div className="space-y-3 pt-1">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Ad Target Link URL (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.bannerLink}
+                    onChange={(e) => setFormData({ ...formData, bannerLink: e.target.value })}
+                    placeholder="https://example.com/product-landing-page"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    URL opened when visitors click this ad on the blog page.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Ad Title / Caption (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.bannerTitle}
+                    onChange={(e) => setFormData({ ...formData, bannerTitle: e.target.value })}
+                    placeholder="e.g. Special Offer on Chemical Earthing Rods"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* SEO Metadata Settings */}

@@ -9,6 +9,7 @@ interface ImageUploaderProps {
   value: string;
   onChange: (url: string) => void;
   aspectRatio?: "video" | "banner";
+  description?: string;
 }
 
 export default function ImageUploader({
@@ -16,6 +17,7 @@ export default function ImageUploader({
   value,
   onChange,
   aspectRatio = "video",
+  description,
 }: ImageUploaderProps) {
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(value || null);
@@ -71,21 +73,28 @@ export default function ImageUploader({
 
   return (
     <div className="w-full space-y-2">
-      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-        {label}
-      </label>
+      <div>
+        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+          {label}
+        </label>
+        {description && (
+          <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 mt-0.5">
+            {description}
+          </p>
+        )}
+      </div>
 
       {preview ? (
-        <div className="relative group rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-950">
-          <div className={`relative ${aspectRatio === "banner" ? "h-40" : "h-56"} w-full`}>
+        <div className="relative group rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-900 flex items-center justify-center p-2">
+          <div className="relative w-full max-h-56 min-h-[140px] flex items-center justify-center">
             {/* Standard img or Next.js Image for local and remote URLs */}
             <img
               src={preview}
               alt={label}
-              className="w-full h-full object-cover"
+              className="w-full h-auto max-h-52 object-contain rounded-xl"
             />
             {loading && (
-              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center text-white space-y-2">
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center text-white space-y-2 rounded-xl">
                 <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
                 <span className="text-sm font-medium">Uploading image...</span>
               </div>
@@ -114,6 +123,11 @@ export default function ImageUploader({
               <span className="font-semibold text-emerald-600 dark:text-emerald-400">Click to upload</span> or drag and drop
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400">PNG, JPG, WEBP, GIF up to 10MB</p>
+            {description && (
+              <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-1">
+                {description}
+              </p>
+            )}
           </div>
           <input
             type="file"

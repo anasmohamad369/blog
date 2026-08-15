@@ -1,3 +1,5 @@
+"use client";
+
 import BlogCard from "./BlogCard";
 import { Blog } from "@/lib/types";
 

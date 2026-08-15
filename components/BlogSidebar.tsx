@@ -3,6 +3,7 @@ import Image from "next/image";
 import { User, Tag, ShieldAlert, ArrowRight, ExternalLink, Megaphone } from "lucide-react";
 import { Blog } from "@/lib/types";
 import { AdConfig } from "@/lib/ads";
+import { parseBannerData } from "@/lib/blogs";
 
 interface BlogSidebarProps {
   blog: Blog;
@@ -10,6 +11,12 @@ interface BlogSidebarProps {
 }
 
 export default function BlogSidebar({ blog, heroAd }: BlogSidebarProps) {
+  const blogBanner = parseBannerData(blog.bannerImage);
+  const adImage = blogBanner.imageUrl || heroAd?.imageUrl;
+  const adTitle = blogBanner.title || (blogBanner.imageUrl ? "" : (heroAd?.title || ""));
+  const rawLink = blogBanner.linkUrl || heroAd?.linkUrl || "";
+  const adLink = rawLink && rawLink.trim() !== "" && rawLink !== "#" ? rawLink.trim() : null;
+
   return (
     <aside className="space-y-8 lg:sticky lg:top-24">
       {/* Author Card */}
@@ -29,7 +36,7 @@ export default function BlogSidebar({ blog, heroAd }: BlogSidebarProps) {
       </div>
 
       {/* Featured Sponsored Advertisement Box */}
-      {heroAd && (
+      {adImage && (
         <div className="p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-md space-y-4 group">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
@@ -39,25 +46,38 @@ export default function BlogSidebar({ blog, heroAd }: BlogSidebarProps) {
             <span className="text-[10px] text-slate-400 font-semibold uppercase">Featured</span>
           </div>
 
-          <a
-            href={heroAd.linkUrl || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block space-y-3"
-          >
-            <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800">
-              <Image
-                src={heroAd.imageUrl || "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200&auto=format&fit=crop"}
-                alt={heroAd.title || "Featured Sponsor"}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
+          {adLink ? (
+            <a
+              href={adLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block space-y-3"
+            >
+              <div className="relative w-full rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-1">
+                <img
+                  src={adImage}
+                  alt={adTitle || "Sponsored Advertisement"}
+                  className="w-full h-auto max-h-80 object-contain rounded-xl group-hover:scale-102 transition-transform duration-500"
+                />
+              </div>
+              {adTitle && (
+                <div className="flex items-center justify-between text-slate-900 dark:text-white font-bold text-xs">
+                  <span className="line-clamp-2">{adTitle}</span>
+                  <ExternalLink className="w-4 h-4 text-emerald-500 ml-2 flex-shrink-0" />
+                </div>
+              )}
+            </a>
+          ) : (
+            <div className="space-y-3">
+              <div className="relative w-full rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-1">
+                <img
+                  src={adImage}
+                  alt={adTitle || "Sponsored Advertisement"}
+                  className="w-full h-auto max-h-80 object-contain rounded-xl"
+                />
+              </div>
             </div>
-            <div className="flex items-center justify-between text-slate-900 dark:text-white font-bold text-xs">
-              <span className="line-clamp-2">{heroAd.title || "Featured Product Announcement"}</span>
-              <ExternalLink className="w-4 h-4 text-emerald-500 ml-2 flex-shrink-0" />
-            </div>
-          </a>
+          )}
         </div>
       )}
 

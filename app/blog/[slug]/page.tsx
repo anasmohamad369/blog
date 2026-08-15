@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
 import { Calendar, Clock, ArrowLeft, User, Tag } from "lucide-react";
-import { getBlogBySlug, getRelatedBlogs } from "@/lib/blogs";
+import { getBlogBySlug, getRelatedBlogs, parseBannerData } from "@/lib/blogs";
 import { getHeroAd } from "@/lib/ads";
 import { calculateReadingTime } from "@/lib/utils";
 import BlogContent from "@/components/BlogContent";
@@ -288,12 +288,17 @@ export default async function SingleBlogPage({ params }: BlogSlugPageProps) {
             )}
 
             {/* Full-width Advertisement Banner Image/Text overlay below article */}
-            <BlogBanner
-              bannerImage={blog.bannerImage || heroAd.imageUrl}
-              heading={heroAd.title || "Need Professional Earthing Installation?"}
-              ctaText="Visit Sponsor / Learn More"
-              ctaUrl={heroAd.linkUrl || "/#consultancy"}
-            />
+            {(() => {
+              const articleBanner = parseBannerData(blog.bannerImage);
+              return (
+                <BlogBanner
+                  bannerImage={articleBanner.imageUrl || heroAd.imageUrl}
+                  heading={articleBanner.title || heroAd.title || "Need Professional Earthing Installation?"}
+                  ctaText="Visit Sponsor / Learn More"
+                  ctaUrl={articleBanner.linkUrl || heroAd.linkUrl || "/#consultancy"}
+                />
+              );
+            })()}
           </div>
 
           {/* Sticky Sidebar */}

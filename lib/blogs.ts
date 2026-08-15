@@ -4,6 +4,37 @@ import { calculateReadingTime, generateSlug, parseTags } from "./utils";
 
 export { calculateReadingTime, generateSlug, parseTags };
 
+export interface BannerData {
+  imageUrl: string;
+  linkUrl: string;
+  title: string;
+}
+
+export function parseBannerData(val?: string): BannerData {
+  if (!val) return { imageUrl: "", linkUrl: "", title: "" };
+  if (typeof val === "string" && val.trim().startsWith("{") && val.trim().endsWith("}")) {
+    try {
+      const parsed = JSON.parse(val);
+      return {
+        imageUrl: parsed.imageUrl || "",
+        linkUrl: parsed.linkUrl || "",
+        title: parsed.title || "",
+      };
+    } catch (e) {}
+  }
+  return { imageUrl: val, linkUrl: "", title: "" };
+}
+
+export function stringifyBannerData(data: { imageUrl: string; linkUrl?: string; title?: string }): string {
+  if (!data.imageUrl) return "";
+  if (!data.linkUrl && !data.title) return data.imageUrl;
+  return JSON.stringify({
+    imageUrl: data.imageUrl,
+    linkUrl: data.linkUrl || "",
+    title: data.title || "",
+  });
+}
+
 // The table is "Blog" (capital B) with camelCase columns as created in Supabase
 const TABLE = "Blog";
 

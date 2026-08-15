@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, ShieldCheck, Zap, Layers, ExternalLink } from "lucide-react";
+import { ArrowRight, ShieldCheck, Zap, Layers, Megaphone, ExternalLink } from "lucide-react";
 import BlogCard from "@/components/BlogCard";
 import ConsultancyForm from "@/components/ConsultancyForm";
 import { getLatestBlogs } from "@/lib/blogs";
@@ -15,11 +15,9 @@ export default async function HomePage() {
     getHeroAd(),
   ]);
 
-  const adImage = heroAd.imageUrl || "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200&auto=format&fit=crop";
-
   return (
     <div className="space-y-16 md:space-y-24 pb-20 bg-white dark:bg-slate-950">
-      {/* 1. Hero Section - Clean Light UI with Text on Left & Advertisement Placement on Right */}
+      {/* 1. Hero Section - Clean Light UI with Text on Left & Dynamic Advertisement Placement on Right */}
       <section className="bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-200/80 dark:border-slate-800 py-16 md:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
@@ -56,33 +54,54 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right Side: Advertisement Placement */}
+            {/* Right Side: Dynamic Advertisement Placement (Configured in Admin Panel) */}
             <div className="lg:col-span-5 w-full animate-fade-in-up" style={{ animationDelay: "150ms" }}>
-              <div className="relative group rounded-3xl overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-800 p-2 shadow-lg hover:shadow-xl transition-shadow">
-                <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-slate-900/80 backdrop-blur-md rounded-full text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 border border-emerald-500/30 flex items-center space-x-1">
-                  <span>Sponsored Ad</span>
+              <div className="relative group rounded-3xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-xl space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    <Megaphone className="w-4 h-4 text-emerald-500" />
+                    <span>Sponsored Ad</span>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase">Featured</span>
                 </div>
 
-                <a
-                  href={heroAd.linkUrl || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block relative h-64 sm:h-80 w-full rounded-2xl overflow-hidden group-hover:opacity-95 transition-opacity"
-                >
-                  <img
-                    src={adImage}
-                    alt={heroAd.title || "Advertisement"}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent flex items-end p-5">
-                    <div className="flex items-center justify-between w-full text-white">
-                      <span className="text-xs sm:text-sm font-bold line-clamp-1">
-                        {heroAd.title || "Featured Sponsor Announcement"}
-                      </span>
-                      <ExternalLink className="w-4 h-4 text-emerald-400 ml-2 flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                {heroAd.linkUrl && heroAd.linkUrl.trim() !== "" && heroAd.linkUrl !== "#" ? (
+                  <a
+                    href={heroAd.linkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block space-y-3"
+                  >
+                    <div className="relative w-full rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-1">
+                      <img
+                        src={heroAd.imageUrl || "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200&auto=format&fit=crop"}
+                        alt={heroAd.title || "Featured Sponsor"}
+                        className="w-full h-auto max-h-80 object-contain rounded-xl group-hover:scale-102 transition-transform duration-500"
+                      />
                     </div>
+                    {heroAd.title && (
+                      <div className="flex items-center justify-between text-slate-900 dark:text-white font-bold text-xs">
+                        <span className="line-clamp-2">{heroAd.title}</span>
+                        <ExternalLink className="w-4 h-4 text-emerald-500 ml-2 flex-shrink-0" />
+                      </div>
+                    )}
+                  </a>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="relative w-full rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-1">
+                      <img
+                        src={heroAd.imageUrl || "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200&auto=format&fit=crop"}
+                        alt={heroAd.title || "Featured Sponsor"}
+                        className="w-full h-auto max-h-80 object-contain rounded-xl"
+                      />
+                    </div>
+                    {heroAd.title && (
+                      <div className="text-slate-900 dark:text-white font-bold text-xs">
+                        <span>{heroAd.title}</span>
+                      </div>
+                    )}
                   </div>
-                </a>
+                )}
               </div>
             </div>
 

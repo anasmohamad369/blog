@@ -84,10 +84,10 @@ export default function AdManager() {
         </div>
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-            Hero Section Advertisement Banner
+            Global Advertisement Banner
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Upload the banner image and hyperlink destination for the home page hero section.
+            Upload the banner image, ad title, and target link URL to display dynamically on the home page hero section and blog pages.
           </p>
         </div>
       </div>
@@ -101,6 +101,7 @@ export default function AdManager() {
               value={imageUrl}
               onChange={(url) => setImageUrl(url)}
               aspectRatio="banner"
+              description="Recommended dimensions: 1200 x 630 px (or 16:9 ratio)"
             />
           </div>
 
@@ -134,7 +135,7 @@ export default function AdManager() {
                 <ExternalLink className="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" />
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Clicking the banner on the Home Page Hero right-side will open this link in a new tab.
+                Clicking the advertisement banner on the home page hero section or blog pages will open this link in a new tab.
               </p>
             </div>
 

@@ -2,15 +2,18 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Blog } from "@/lib/types";
-import { Search, ArrowUpRight, SearchX, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
+import { AdConfig } from "@/lib/ads";
+import { Search, ArrowUpRight, SearchX, ChevronLeft, ChevronRight, Megaphone, ExternalLink } from "lucide-react";
 
 interface BlogListClientProps {
   initialBlogs: Blog[];
   categories: string[];
+  heroAd?: AdConfig;
 }
 
-export default function BlogListClient({ initialBlogs, categories }: BlogListClientProps) {
+export default function BlogListClient({ initialBlogs, categories, heroAd }: BlogListClientProps) {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -58,7 +61,7 @@ export default function BlogListClient({ initialBlogs, categories }: BlogListCli
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           
-          {/* Left Column: Title, Description & Category Navigation */}
+          {/* Left Column: Title, Description, Category Navigation & Sponsored Ad */}
           <div className="lg:col-span-4 lg:sticky lg:top-28 space-y-8">
             <div className="space-y-3">
               <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -93,6 +96,41 @@ export default function BlogListClient({ initialBlogs, categories }: BlogListCli
                 })}
               </div>
             </div>
+
+            {/* Sponsored Advertisement Card (Only displayed while seeing blog) */}
+            {heroAd && (
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="p-5 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 group">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                      <Megaphone className="w-3.5 h-3.5" />
+                      <span>Sponsored Ad</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Featured</span>
+                  </div>
+
+                  <a
+                    href={heroAd.linkUrl || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block space-y-3"
+                  >
+                    <div className="relative h-40 w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+                      <Image
+                        src={heroAd.imageUrl || "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200&auto=format&fit=crop"}
+                        alt={heroAd.title || "Featured Sponsor"}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between text-slate-900 dark:text-white font-bold text-xs">
+                      <span className="line-clamp-2">{heroAd.title || "Featured Product Announcement"}</span>
+                      <ExternalLink className="w-4 h-4 text-emerald-500 ml-2 flex-shrink-0" />
+                    </div>
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Column: Search Bar & Stacked List Cards */}
