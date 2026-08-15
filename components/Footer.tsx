@@ -20,7 +20,7 @@ export default function Footer() {
           <p>© {new Date().getFullYear()} Earthing Solutions Inc. All rights reserved.</p>
           
           <div className="flex items-center space-x-6">
-            <p>Built with Next.js App Router & Tailwind CSS</p>
+           
             <Link
               href="/admin/blog"
               className="inline-flex items-center space-x-1 text-slate-400 dark:text-slate-600 hover:text-slate-700 dark:hover:text-slate-300 transition-colors py-1 px-2 rounded hover:bg-slate-100 dark:hover:bg-slate-900"
