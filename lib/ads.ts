@@ -11,7 +11,7 @@ export interface AdConfig {
 const DEFAULT_AD: AdConfig = {
   id: "hero-ad",
   imageUrl: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200&auto=format&fit=crop",
-  linkUrl: "https://earthingsolutions.com",
+  linkUrl: "https://www.structuralearthing.com",
   title: "Featured Earthing Equipment Banner",
 };
 

@@ -11,42 +11,46 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://earthingsolutions.com"),
+  metadataBase: new URL("https://www.structuralearthing.com"),
   title: {
-    default: "Earthing Solutions | Lightning Protection System & Earthing Mart DFM Hub",
-    template: "%s | Earthing Solutions",
+    default: "Structural Earthing: Foundation, Design, Lightning Protection & Standards",
+    template: "%s | Structural Earthing",
   },
   description:
-    "Official Earthing Mart & DFM Hub blog hub for certified lightning protection systems, chemical earthing equipment, industrial grounding standards, and electrical safety guides.",
+    "Learn structural earthing, foundation earthing, bonding, lightning protection, design, installation, testing, products, standards and compliance with practical engineering guidance",
   keywords: [
-    "Blog",
-    "blog",
-    "Lightning Protection System",
+    "Structural Earthing",
+    "Structural Earthing System",
+    "Structural Earthing System Manufacturer",
+    "Structural Earthing System in India",
+    "Structural Earthing Manufacturer in India",
+    "Foundation Earthing System",
+    "Foundation Earthing",
+    "Bonding",
+    "Lightning Protection",
     "lightning protection system",
-    "Earthing",
-    "earthing",
-    "Earthing Mart",
-    "DFM Hub",
-    "Earthing Solutions",
-    "Chemical Earthing",
-    "Grounding System",
-    "Earth Electrode",
+    "Structural Earthing Design",
+    "Earthing Installation",
+    "Earthing Testing",
+    "Earthing Products",
+    "Earthing Standards",
     "IEEE 81",
     "IS 3043",
     "IEC 62305",
+    "BS 7430",
     "Electrical Grounding Safety",
   ],
-  authors: [{ name: "Earthing Solutions & DFM Hub Team" }],
-  publisher: "Earthing Solutions Inc. / Earthing Mart DFM Hub",
+  authors: [{ name: "Structural Earthing Technical Team" }],
+  publisher: "Structural Earthing",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Earthing Solutions | Lightning Protection System & Earthing Mart DFM Hub",
+    title: "Structural Earthing: Foundation, Design, Lightning Protection & Standards",
     description:
-      "Explore expert articles, technical guides, installation specs, and industrial standards for chemical earthing and lightning protection systems.",
-    url: "https://earthingsolutions.com",
-    siteName: "Earthing Solutions - Earthing Mart DFM Hub",
+      "Learn structural earthing, foundation earthing, bonding, lightning protection, design, installation, testing, products, standards and compliance with practical engineering guidance",
+    url: "https://www.structuralearthing.com",
+    siteName: "Structural Earthing",
     locale: "en_US",
     type: "website",
     images: [
@@ -54,15 +58,15 @@ export const metadata: Metadata = {
         url: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=1200&auto=format&fit=crop",
         width: 1200,
         height: 630,
-        alt: "Earthing Solutions Lightning Protection & Grounding Hub",
+        alt: "Structural Earthing, Foundation, Design & Lightning Protection Guide",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Earthing Solutions | Lightning Protection System & Earthing Mart DFM Hub",
+    title: "Structural Earthing: Foundation, Design, Lightning Protection & Standards",
     description:
-      "Official Earthing Mart & DFM Hub blog for certified lightning protection systems and chemical earthing equipment.",
+      "Learn structural earthing, foundation earthing, bonding, lightning protection, design, installation, testing, products, standards and compliance with practical engineering guidance",
     images: ["https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=1200&auto=format&fit=crop"],
   },
   robots: {
@@ -87,12 +91,12 @@ export default function RootLayout({
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Earthing Solutions - Earthing Mart DFM Hub",
-    "alternateName": ["Earthing Mart", "DFM Hub", "Lightning Protection System Blog Hub"],
-    "url": "https://earthingsolutions.com",
+    "name": "Structural Earthing",
+    "alternateName": ["Structural Earthing Hub", "Foundation Earthing & Lightning Protection"],
+    "url": "https://www.structuralearthing.com",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://earthingsolutions.com/blog?search={search_term_string}",
+      "target": "https://www.structuralearthing.com/blog?search={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   };
@@ -100,10 +104,10 @@ export default function RootLayout({
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Earthing Solutions - Earthing Mart DFM Hub",
-    "url": "https://earthingsolutions.com",
-    "logo": "https://earthingsolutions.com/logo.png",
-    "description": "Provider of certified chemical earthing, lightning protection systems, and industrial grounding solutions."
+    "name": "Structural Earthing",
+    "url": "https://www.structuralearthing.com",
+    "logo": "https://www.structuralearthing.com/logo.png",
+    "description": "Learn structural earthing, foundation earthing, bonding, lightning protection, design, installation, testing, products, standards and compliance with practical engineering guidance"
   };
 
   return (
@@ -140,3 +144,4 @@ export default function RootLayout({
     </html>
   );
 }
+

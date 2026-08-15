@@ -29,27 +29,30 @@ export default async function HomePage() {
                 <span>Industrial Grounding & Safety Experts</span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-                Build Safer Electrical Systems With <span className="text-emerald-600 dark:text-emerald-400">Certified Earthing</span>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
+                {/* Build Safer Electrical Systems With  */}
+                Structural Earthing
+             <span className="text-emerald-600 dark:text-emerald-400"> {" "} Knowledge Hub!</span>
+
               </h1>
 
               <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl font-normal leading-relaxed">
-                Discover comprehensive technical guides, industry standards, installation best practices, and expert advice on electrical grounding and lightning protection.
-              </p>
+A practical engineering resource covering structural earthing, foundation earthing, grounding, equipotential bonding, lightning protection, earthing design, testing, applicable standards, and installation practices              </p>
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <Link
-                  href="/blog"
+                  href="#about"
                   className="px-7 py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow-md hover:shadow-lg transition-all flex items-center space-x-2"
                 >
-                  <span>Explore Latest Articles</span>
+                  <span>Explore Structural Earthing</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
-                  href="#about"
+                  href="/blog"
                   className="px-7 py-3.5 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-sm transition-all"
                 >
-                  <span>Learn About Earthing</span>
+                  <span>Browse Standards
+</span>
                 </Link>
               </div>
             </div>
@@ -138,22 +141,22 @@ export default async function HomePage() {
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-3.5 py-1.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                 <Layers className="w-4 h-4" />
-                <span>Electrical Safety Essentials</span>
+                <span>Structural Earthing</span>
               </div>
 
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-                What is Earthing?
-              </h2>
+              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
+What is Structural Earthing?
+              </h1>
 
               <div className="space-y-4 text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
                 <p>
-                  Earthing, also known as grounding, is the process of connecting electrical equipment safely to the earth. It provides a direct path for unwanted electrical current, protecting people and devices from electric shocks and equipment damage.
+                  Structural earthing is an important part of modern electrical safety, building infrastructure and lightning protection. It involves the planned integration of earthing and bonding arrangements with a building or structure to provide a controlled path for fault currents, lightning currents and unwanted electrical potential differences.
                 </p>
                 <p>
-                  A proper earthing system improves electrical safety, reduces the risk of fire caused by leakage currents, and protects expensive equipment from voltage surges and lightning strikes. It is an essential part of every residential, commercial, and industrial electrical installation.
+                  However, structural earthing is more than simply installing an earth electrode or connecting a conductor to reinforcement steel. A reliable system requires consideration of the building structure, foundation, reinforcement, soil conditions, electrical installation, lightning protection system, bonding requirements, applicable standards and installation practices.
                 </p>
                 <p>
-                  At Earthing Solutions, we provide reliable grounding products, expert installation services, and technical guidance to help you build safer and more efficient electrical systems that comply with industry standards.
+                  StructuralEarthing.com is being developed as a dedicated knowledge platform for understanding these engineering principles in a practical and technically responsible manner.
                 </p>
               </div>
 

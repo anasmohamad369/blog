@@ -127,21 +127,21 @@ export default async function SingleBlogPage({ params }: BlogSlugPageProps) {
     "dateModified": blog.updatedAt,
     "author": {
       "@type": "Organization",
-      "name": "Earthing Solutions Technical Team"
+      "name": "Structural Earthing Technical Team"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Earthing Solutions Inc.",
+      "name": "Structural Earthing",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://earthingsolutions.com/logo.png"
+        "url": "https://www.structuralearthing.com/logo.png"
       }
     },
     "keywords": tagKeywords.join(", "),
     "articleSection": blog.category,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://earthingsolutions.com/blog/${blog.slug}`
+      "@id": `https://www.structuralearthing.com/blog/${blog.slug}`
     }
   };
 
@@ -153,19 +153,19 @@ export default async function SingleBlogPage({ params }: BlogSlugPageProps) {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://earthingsolutions.com"
+        "item": "https://www.structuralearthing.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Blog",
-        "item": "https://earthingsolutions.com/blog"
+        "item": "https://www.structuralearthing.com/blog"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": blog.title,
-        "item": `https://earthingsolutions.com/blog/${blog.slug}`
+        "item": `https://www.structuralearthing.com/blog/${blog.slug}`
       }
     ]
   };

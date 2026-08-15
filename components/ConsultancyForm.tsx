@@ -8,7 +8,7 @@ export default function ConsultancyForm() {
     name: "",
     email: "",
     phone: "",
-    category: "Chemical Earthing Systems",
+    category: "Structural Earthing",
     message: "",
   });
 
@@ -65,11 +65,11 @@ export default function ConsultancyForm() {
           </div>
 
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-            Talk to an <span className="text-emerald-600 dark:text-emerald-400">Earthing Expert</span>
+            Talk to a <span className="text-emerald-600 dark:text-emerald-400">Structural Earthing Expert</span>
           </h2>
 
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
-            Need guidance on soil resistivity, earth pit design, or IEEE 81 grounding standards? Our certified electrical engineers are ready to assist you.
+Need guidance on foundation earthing, structural bonding, earthing design, or lightning protection? Connect with an experienced electrical engineering professional for practical guidance on your project requirements.
           </p>
 
           <div className="space-y-3 pt-2">

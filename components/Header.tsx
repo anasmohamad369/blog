@@ -28,7 +28,7 @@ export default function Header() {
           </div>
           <div>
             <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white block">
-              Earthing<span className="text-emerald-600 dark:text-emerald-400">Solutions</span>
+              Structural <span className="text-emerald-600 dark:text-emerald-400">Earthing</span>
             </span>
             <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest block -mt-1">
               Safety & Grounding
