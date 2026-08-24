@@ -1,5 +1,5 @@
 import { Blog, CreateBlogInput, UpdateBlogInput, BlogFilterOptions, PaginatedBlogsResponse } from "./types";
-import { supabase } from "./supabase";
+import { supabaseAdmin as supabase } from "./supabase";
 import { calculateReadingTime, generateSlug, parseTags } from "./utils";
 
 export { calculateReadingTime, generateSlug, parseTags };
