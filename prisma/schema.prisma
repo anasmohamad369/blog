@@ -8,19 +8,59 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Blog {
-  id             String   @id @default(cuid())
+  id             String    @id
+  slug           String    @unique
   title          String
-  slug           String   @unique
   excerpt        String
   content        String
-  coverImage     String
-  bannerImage    String   @default("")
+  coverImage     String?
+  bannerImage    String?
   category       String
-  tags           String   @default("")
+  tags           String?
   seoTitle       String?
   seoDescription String?
-  published      Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  published      Boolean?  @default(true)
+  createdAt      DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model project_details {
+  id               String   @id
+  siteName         String
+  location         String
+  occupancy        String
+  dimensions       String
+  soilType         String
+  climateZone      String
+  avgResistance    String
+  targetResistance String
+  checklistScore   String
+  lplClass         String
+  riskR1           String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime
+  registrationId   String?
+  userEmail        String?
+  userFullName     String?
+  userPhone        String?
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model project_registrations {
+  id          String   @id
+  fullName    String
+  phoneNumber String
+  email       String
+  companyName String
+  remarks     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  assignedTo  String?
+  location    String?
+  requirement String?
+  source      String   @default("WEBSITE_CONTACT")
+  status      String   @default("NEW")
 }
