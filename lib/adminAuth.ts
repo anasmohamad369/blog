@@ -1,63 +1,68 @@
-import { supabase } from "./supabase";
+import { prisma } from "./prisma";
 import crypto from "crypto";
 
-const DEFAULT_ADMIN_PASSWORD = "1234";
 const CONFIG_ID = "admin-config";
 
-// Simple hash function for session tokens & password storage
 export function hashString(str: string): string {
   return crypto.createHash("sha256").update(str + "earthing_secret_salt_2026").digest("hex");
 }
 
-export async function getAdminPasswordHash(): Promise<string> {
-  try {
-    const { data, error } = await supabase
-      .from("Blog")
-      .select("*")
-      .eq("id", CONFIG_ID)
-      .maybeSingle();
+export async function getAdminPasswordHash(): Promise<string | null> {
+  if (process.env.ADMIN_PASSWORD) {
+    return hashString(process.env.ADMIN_PASSWORD);
+  }
 
-    if (!error && data && data.excerpt) {
-      return data.excerpt; // stored hashed password
+  try {
+    const data = await prisma.blog.findUnique({
+      where: { id: CONFIG_ID },
+    });
+
+    if (data && data.excerpt) {
+      return data.excerpt;
     }
   } catch (err) {
-    console.warn("getAdminPasswordHash warning:", err);
+    console.error("getAdminPasswordHash error:", err);
   }
-  // Default to hashed "1234"
-  return hashString(DEFAULT_ADMIN_PASSWORD);
+  return null;
 }
 
 export async function verifyAdminPassword(inputPassword: string): Promise<boolean> {
-  const currentHash = await getAdminPasswordHash();
+  let currentHash = await getAdminPasswordHash();
+
+  // If DB has no admin password configured yet, set the submitted password as initial admin password
+  if (!currentHash) {
+    const success = await setAdminPassword(inputPassword);
+    if (success) {
+      return true;
+    }
+    return false;
+  }
+
   const inputHash = hashString(inputPassword);
   return currentHash === inputHash;
 }
 
 export async function setAdminPassword(newPassword: string): Promise<boolean> {
   const newHash = hashString(newPassword);
-  const now = new Date().toISOString();
 
-  const row = {
-    id: CONFIG_ID,
+  const data = {
     title: "Admin Portal Config",
     slug: "admin-portal-config",
-    excerpt: newHash, // Store password hash in excerpt
+    excerpt: newHash,
     content: "Admin Authentication System Configuration",
     coverImage: "",
     bannerImage: "",
     category: "SystemConfig",
     tags: "auth",
     published: false,
-    createdAt: now,
-    updatedAt: now,
   };
 
   try {
-    const { error } = await supabase.from("Blog").upsert([row]);
-    if (error) {
-      console.error("setAdminPassword error:", error.message);
-      return false;
-    }
+    await prisma.blog.upsert({
+      where: { id: CONFIG_ID },
+      update: { excerpt: newHash },
+      create: { id: CONFIG_ID, ...data },
+    });
     return true;
   } catch (err) {
     console.error("setAdminPassword exception:", err);
@@ -72,6 +77,5 @@ export function generateSessionToken(): string {
 
 export async function isValidSession(token: string): Promise<boolean> {
   if (!token) return false;
-  // Check if token matches expected hashed format length
   return token.length === 64;
 }

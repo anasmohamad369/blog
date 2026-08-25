@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
-
-const BUCKET = "blog-images";
+import fs from "fs/promises";
+import path from "path";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,37 +15,15 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
     const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
 
-    // Auto-create bucket if it doesn't exist
-    const { data: buckets } = await supabaseAdmin.storage.listBuckets();
-    const bucketExists = buckets?.some((b) => b.name === BUCKET);
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    await fs.mkdir(uploadDir, { recursive: true });
 
-    if (!bucketExists) {
-      await supabaseAdmin.storage.createBucket(BUCKET, {
-        public: true,
-        fileSizeLimit: 10 * 1024 * 1024,
-        allowedMimeTypes: ["image/png", "image/jpeg", "image/webp", "image/gif", "image/svg+xml"],
-      });
-    }
+    const filePath = path.join(uploadDir, fileName);
+    await fs.writeFile(filePath, buffer);
 
-    // Upload file to Supabase Storage
-    const { data, error } = await supabaseAdmin.storage
-      .from(BUCKET)
-      .upload(fileName, buffer, {
-        contentType: file.type || "image/png",
-        upsert: true,
-      });
+    const publicUrl = `/uploads/${fileName}`;
 
-    if (error) {
-      console.error("Supabase Storage upload error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    // Get public URL
-    const { data: publicUrlData } = supabaseAdmin.storage
-      .from(BUCKET)
-      .getPublicUrl(data.path);
-
-    return NextResponse.json({ url: publicUrlData.publicUrl }, { status: 200 });
+    return NextResponse.json({ url: publicUrl }, { status: 200 });
   } catch (error: any) {
     console.error("Image upload error:", error);
     return NextResponse.json({ error: error?.message || "Image upload failed" }, { status: 500 });

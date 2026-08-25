@@ -1,5 +1,5 @@
 import { Blog, CreateBlogInput, UpdateBlogInput, BlogFilterOptions, PaginatedBlogsResponse } from "./types";
-import { supabase } from "./supabase";
+import { prisma } from "./prisma";
 import { calculateReadingTime, generateSlug, parseTags } from "./utils";
 
 export { calculateReadingTime, generateSlug, parseTags };
@@ -35,10 +35,6 @@ export function stringifyBannerData(data: { imageUrl: string; linkUrl?: string; 
   });
 }
 
-// The table is "Blog" (capital B) with camelCase columns as created in Supabase
-const TABLE = "Blog";
-
-// Format Supabase row into Blog interface
 function formatRow(row: any): Blog {
   return {
     id: row.id,
@@ -53,8 +49,8 @@ function formatRow(row: any): Blog {
     seoTitle: row.seoTitle || row.title,
     seoDescription: row.seoDescription || row.excerpt,
     published: row.published ?? true,
-    createdAt: row.createdAt || new Date().toISOString(),
-    updatedAt: row.updatedAt || new Date().toISOString(),
+    createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : row.createdAt || new Date().toISOString(),
+    updatedAt: row.updatedAt instanceof Date ? row.updatedAt.toISOString() : row.updatedAt || new Date().toISOString(),
   };
 }
 
@@ -62,38 +58,45 @@ export async function getAllBlogs(options: BlogFilterOptions = {}): Promise<Pagi
   const { search = "", category = "", page = 1, limit = 6 } = options;
 
   try {
-    let query = supabase.from(TABLE).select("*", { count: "exact" });
-    query = query.neq("id", "hero-ad");
-    query = query.neq("id", "admin-config");
-    query = query.eq("published", true);
+    const where: any = {
+      id: { notIn: ["hero-ad", "admin-config"] },
+      published: true,
+    };
 
     if (category && category !== "All") {
-      query = query.eq("category", category);
+      where.category = category;
     }
+
     if (search) {
-      query = query.or(`title.ilike.%${search}%,excerpt.ilike.%${search}%,content.ilike.%${search}%,category.ilike.%${search}%,tags.ilike.%${search}%`);
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { excerpt: { contains: search, mode: "insensitive" } },
+        { content: { contains: search, mode: "insensitive" } },
+        { category: { contains: search, mode: "insensitive" } },
+        { tags: { contains: search, mode: "insensitive" } },
+      ];
     }
 
-    query = query.order("createdAt", { ascending: false });
+    const [data, count] = await Promise.all([
+      prisma.blog.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.blog.count({ where }),
+    ]);
 
-    const from = (page - 1) * limit;
-    const to = from + limit - 1;
-    query = query.range(from, to);
-
-    const { data, count, error } = await query;
-
-    if (error) {
-      console.error("getAllBlogs error:", error);
-      return { blogs: [], total: 0, page: 1, totalPages: 1, categories: ["All"] };
-    }
-
-    const blogs = (data || []).map(formatRow);
+    const blogs = data.map(formatRow);
     const total = count || blogs.length;
     const totalPages = Math.ceil(total / limit) || 1;
 
-    // Fetch distinct categories
-    const { data: catData } = await supabase.from(TABLE).select("category");
-    const distinctCat = catData ? Array.from(new Set(catData.map((c: any) => c.category))) : [];
+    const catData = await prisma.blog.findMany({
+      where: { id: { notIn: ["hero-ad", "admin-config"] } },
+      select: { category: true },
+      distinct: ["category"],
+    });
+    const distinctCat = catData.map((c) => c.category);
     const categories = ["All", ...distinctCat];
 
     return { blogs, total, page, totalPages, categories };
@@ -104,99 +107,96 @@ export async function getAllBlogs(options: BlogFilterOptions = {}): Promise<Pagi
 }
 
 export async function getLatestBlogs(limit = 3): Promise<Blog[]> {
-  const { data, error } = await supabase
-    .from(TABLE)
-    .select("*")
-    .neq("id", "hero-ad")
-    .eq("published", true)
-    .order("createdAt", { ascending: false })
-    .limit(limit);
-
-  if (error || !data) return [];
-  return data.map(formatRow);
+  try {
+    const data = await prisma.blog.findMany({
+      where: {
+        id: { notIn: ["hero-ad", "admin-config"] },
+        published: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+    return data.map(formatRow);
+  } catch (error) {
+    console.error("getLatestBlogs error:", error);
+    return [];
+  }
 }
 
 export async function getBlogBySlug(slug: string): Promise<Blog | null> {
-  const { data, error } = await supabase
-    .from(TABLE)
-    .select("*")
-    .eq("slug", slug)
-    .maybeSingle();
-
-  if (error || !data) return null;
-  return formatRow(data);
+  try {
+    const data = await prisma.blog.findUnique({
+      where: { slug },
+    });
+    if (!data) return null;
+    return formatRow(data);
+  } catch (error) {
+    console.error("getBlogBySlug error:", error);
+    return null;
+  }
 }
 
 export async function getBlogById(id: string): Promise<Blog | null> {
-  const { data, error } = await supabase
-    .from(TABLE)
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-
-  if (error || !data) return null;
-  return formatRow(data);
+  try {
+    const data = await prisma.blog.findUnique({
+      where: { id },
+    });
+    if (!data) return null;
+    return formatRow(data);
+  } catch (error) {
+    console.error("getBlogById error:", error);
+    return null;
+  }
 }
 
 export async function getRelatedBlogs(category: string, currentSlug: string, limit = 3): Promise<Blog[]> {
-  const { data, error } = await supabase
-    .from(TABLE)
-    .select("*")
-    .neq("id", "hero-ad")
-    .eq("category", category)
-    .neq("slug", currentSlug)
-    .eq("published", true)
-    .order("createdAt", { ascending: false })
-    .limit(limit);
-
-  if (error || !data) return [];
-  return data.map(formatRow);
+  try {
+    const data = await prisma.blog.findMany({
+      where: {
+        id: { notIn: ["hero-ad", "admin-config"] },
+        category,
+        slug: { not: currentSlug },
+        published: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+    return data.map(formatRow);
+  } catch (error) {
+    console.error("getRelatedBlogs error:", error);
+    return [];
+  }
 }
 
 export async function createBlog(input: CreateBlogInput): Promise<Blog> {
   const slug = input.slug ? generateSlug(input.slug) : generateSlug(input.title);
   const tagsString = Array.isArray(input.tags) ? input.tags.join(", ") : input.tags || "";
-  const now = new Date().toISOString();
-  const id = "blog-" + Date.now();
 
-  const row = {
-    id,
-    title: input.title.trim(),
-    slug,
-    excerpt: input.excerpt.trim(),
-    content: input.content,
-    coverImage: input.coverImage,
-    bannerImage: input.bannerImage || "",
-    category: input.category,
-    tags: tagsString,
-    seoTitle: input.seoTitle || input.title,
-    seoDescription: input.seoDescription || input.excerpt,
-    published: input.published ?? true,
-    createdAt: now,
-    updatedAt: now,
-  };
+  const created = await prisma.blog.create({
+    data: {
+      title: input.title.trim(),
+      slug,
+      excerpt: input.excerpt.trim(),
+      content: input.content,
+      coverImage: input.coverImage,
+      bannerImage: input.bannerImage || "",
+      category: input.category,
+      tags: tagsString,
+      seoTitle: input.seoTitle || input.title,
+      seoDescription: input.seoDescription || input.excerpt,
+      published: input.published ?? true,
+    },
+  });
 
-  const { data, error } = await supabase
-    .from(TABLE)
-    .insert([row])
-    .select()
-    .single();
-
-  if (error) {
-    console.error("createBlog error:", error);
-    throw new Error(error.message);
-  }
-
-  return formatRow(data);
+  return formatRow(created);
 }
 
 export async function updateBlog(input: UpdateBlogInput): Promise<Blog | null> {
-  const now = new Date().toISOString();
   const tagsString = input.tags !== undefined
     ? (Array.isArray(input.tags) ? input.tags.join(", ") : input.tags)
     : undefined;
 
-  const updateData: any = { updatedAt: now };
+  const updateData: any = {};
   if (input.title) updateData.title = input.title.trim();
   if (input.slug) updateData.slug = generateSlug(input.slug);
   if (input.excerpt) updateData.excerpt = input.excerpt.trim();
@@ -209,26 +209,22 @@ export async function updateBlog(input: UpdateBlogInput): Promise<Blog | null> {
   if (input.seoDescription !== undefined) updateData.seoDescription = input.seoDescription;
   if (input.published !== undefined) updateData.published = input.published;
 
-  const { data, error } = await supabase
-    .from(TABLE)
-    .update(updateData)
-    .eq("id", input.id)
-    .select()
-    .single();
+  const updated = await prisma.blog.update({
+    where: { id: input.id },
+    data: updateData,
+  });
 
-  if (error) {
-    console.error("updateBlog error:", error);
-    throw new Error(error.message);
-  }
-
-  return formatRow(data);
+  return formatRow(updated);
 }
 
 export async function deleteBlog(id: string): Promise<boolean> {
-  const { error } = await supabase.from(TABLE).delete().eq("id", id);
-  if (error) {
+  try {
+    await prisma.blog.delete({
+      where: { id },
+    });
+    return true;
+  } catch (error) {
     console.error("deleteBlog error:", error);
     return false;
   }
-  return true;
 }

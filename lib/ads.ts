@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { prisma } from "./prisma";
 
 export interface AdConfig {
   id: string;
@@ -8,40 +8,34 @@ export interface AdConfig {
   updatedAt?: string;
 }
 
-const DEFAULT_AD: AdConfig = {
-  id: "hero-ad",
-  imageUrl: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200&auto=format&fit=crop",
-  linkUrl: "https://www.structuralearthing.com",
-  title: "Featured Earthing Equipment Banner",
-};
-
 export async function getHeroAd(): Promise<AdConfig> {
   try {
-    const { data, error } = await supabase
-      .from("Blog")
-      .select("*")
-      .eq("id", "hero-ad")
-      .maybeSingle();
+    const data = await prisma.blog.findUnique({
+      where: { id: "hero-ad" },
+    });
 
-    if (!error && data) {
+    if (data) {
       return {
         id: data.id,
-        imageUrl: data.coverImage || DEFAULT_AD.imageUrl,
-        linkUrl: data.excerpt || DEFAULT_AD.linkUrl,
-        title: data.title || DEFAULT_AD.title,
-        updatedAt: data.updatedAt,
+        imageUrl: data.coverImage || "",
+        linkUrl: data.excerpt || "",
+        title: data.title || "",
+        updatedAt: data.updatedAt.toISOString(),
       };
     }
   } catch (err) {
-    console.warn("getHeroAd warning:", err);
+    console.error("getHeroAd exception:", err);
   }
-  return DEFAULT_AD;
+  return {
+    id: "hero-ad",
+    imageUrl: "",
+    linkUrl: "",
+    title: "",
+  };
 }
 
 export async function updateHeroAd(input: { imageUrl: string; linkUrl: string; title?: string }): Promise<AdConfig> {
-  const now = new Date().toISOString();
-  const row = {
-    id: "hero-ad",
+  const data = {
     title: input.title || "Featured Advertisement",
     slug: "hero-ad-config",
     excerpt: input.linkUrl,
@@ -51,38 +45,19 @@ export async function updateHeroAd(input: { imageUrl: string; linkUrl: string; t
     category: "Advertisement",
     tags: "ad",
     published: false,
-    createdAt: now,
-    updatedAt: now,
   };
 
-  try {
-    const { data, error } = await supabase
-      .from("Blog")
-      .upsert([row])
-      .select()
-      .single();
-
-    if (!error && data) {
-      return {
-        id: data.id,
-        imageUrl: data.coverImage,
-        linkUrl: data.excerpt,
-        title: data.title,
-        updatedAt: data.updatedAt,
-      };
-    }
-    if (error) {
-      console.warn("Supabase Ad save warning:", error.message);
-    }
-  } catch (err) {
-    console.warn("updateHeroAd exception:", err);
-  }
+  const updated = await prisma.blog.upsert({
+    where: { id: "hero-ad" },
+    update: data,
+    create: { id: "hero-ad", ...data },
+  });
 
   return {
-    id: "hero-ad",
-    imageUrl: input.imageUrl,
-    linkUrl: input.linkUrl,
-    title: input.title || "Featured Advertisement",
-    updatedAt: now,
+    id: updated.id,
+    imageUrl: updated.coverImage,
+    linkUrl: updated.excerpt,
+    title: updated.title,
+    updatedAt: updated.updatedAt.toISOString(),
   };
 }
