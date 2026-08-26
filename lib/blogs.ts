@@ -174,6 +174,7 @@ export async function createBlog(input: CreateBlogInput): Promise<Blog> {
 
   const created = await prisma.blog.create({
     data: {
+      id: crypto.randomUUID(),
       title: input.title.trim(),
       slug,
       excerpt: input.excerpt.trim(),

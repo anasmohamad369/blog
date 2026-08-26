@@ -20,7 +20,7 @@ export async function getHeroAd(): Promise<AdConfig> {
         imageUrl: data.coverImage || "",
         linkUrl: data.excerpt || "",
         title: data.title || "",
-        updatedAt: data.updatedAt.toISOString(),
+        updatedAt: data.updatedAt ? data.updatedAt.toISOString() : undefined,
       };
     }
   } catch (err) {
@@ -55,9 +55,9 @@ export async function updateHeroAd(input: { imageUrl: string; linkUrl: string; t
 
   return {
     id: updated.id,
-    imageUrl: updated.coverImage,
-    linkUrl: updated.excerpt,
-    title: updated.title,
-    updatedAt: updated.updatedAt.toISOString(),
+    imageUrl: updated.coverImage || "",
+    linkUrl: updated.excerpt || "",
+    title: updated.title || "",
+    updatedAt: updated.updatedAt ? updated.updatedAt.toISOString() : undefined,
   };
 }

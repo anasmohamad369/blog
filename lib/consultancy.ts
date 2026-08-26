@@ -30,6 +30,7 @@ export async function createConsultancyRequest(input: {
 
   const created = await prisma.blog.create({
     data: {
+      id: "consultancy-" + Date.now() + "-" + Math.random().toString(36).substring(2, 7),
       title: reqItem.name,
       slug: "consultancy-" + Date.now() + "-" + Math.random().toString(36).substring(2, 7),
       excerpt: `${reqItem.email} • ${reqItem.phone}`,
@@ -51,7 +52,7 @@ export async function createConsultancyRequest(input: {
     category: reqItem.category,
     message: reqItem.message,
     status: "new",
-    createdAt: created.createdAt.toISOString(),
+    createdAt: created.createdAt ? created.createdAt.toISOString() : new Date().toISOString(),
   };
 }
 
@@ -72,7 +73,7 @@ export async function getConsultancyRequests(): Promise<ConsultancyRequest[]> {
         category: d.tags || "General Inquiry",
         message: d.content,
         status: (d.seoTitle as EnquiryStatus) || "new",
-        createdAt: d.createdAt.toISOString(),
+        createdAt: d.createdAt ? d.createdAt.toISOString() : new Date().toISOString(),
       };
     });
   } catch (err) {
